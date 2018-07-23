@@ -1,0 +1,7 @@
+{
+  "name": "matomo-reporting-js",
+  "version": "1.0.0",
+  "main": "index.js",
+  "author": "DecentM <decentm@decentm.com>",
+  "license": "MIT"
+}
