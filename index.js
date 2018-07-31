@@ -66,6 +66,68 @@ module.exports = class MatomoApi {
     this.queryQueue = []
     this.lockTimeout = null
     this.compiled = ''
+
+    this.queue = pify((query, thisCallback) => {
+      this.queryQueue.push({
+        'queryItem': QS.stringify(query),
+        'callback':  thisCallback,
+      })
+
+      if (!this.lockTimeout) {
+        this.lockTimeout = setTimeout(() => {
+          this.queryQueue.forEach(({queryItem,}, index) => {
+            this.compiled = `${this.compiled}&urls[${index}]=${encodeURIComponent(queryItem)}`
+          })
+
+          const bulk = {
+            'module': 'API',
+            'method': 'API.getBulkRequest',
+            'format': 'JSON',
+          }
+          const api = `${this.options.endpoint}?${QS.stringify(bulk)}${this.compiled}`
+
+          if (this.options.debug) {
+            /* eslint-disable-next-line no-console */
+            console.log('MatomoApi: Fetching', api)
+          }
+
+          this.fetch(api, {
+            'headers': this.options.headers,
+          })
+          .then((response) => response.json())
+          .then((data) => {
+            this.queryQueue.forEach(({callback,}, index,) => {
+              const item = data[index]
+
+              if (!item) {
+                return callback(new TypeError(`Received falsy result: ${JSON.stringify(item)} (${typeof item})`))
+              }
+
+              if (item.result === 'error') {
+                return callback(new MatomoError(item.message), null)
+              }
+
+              if (item.length === 1) {
+                return callback(null, item[0])
+              }
+
+              return callback(null, item)
+            })
+
+            this.reset()
+          })
+          .catch((error) => {
+            this.reset()
+
+            if (this.handler) {
+              return this.handler(error)
+            }
+
+            throw error
+          })
+        }, this.options.patience)
+      }
+    })
   }
 
   reset () {
@@ -80,66 +142,4 @@ module.exports = class MatomoApi {
 
     return this.queue(query)
   }
-
-  queue = pify((query, thisCallback) => {
-    this.queryQueue.push({
-      'queryItem': QS.stringify(query),
-      'callback':  thisCallback,
-    })
-
-    if (!this.lockTimeout) {
-      this.lockTimeout = setTimeout(() => {
-        this.queryQueue.forEach(({queryItem,}, index) => {
-          this.compiled = `${this.compiled}&urls[${index}]=${encodeURIComponent(queryItem)}`
-        })
-
-        const bulk = {
-          'module': 'API',
-          'method': 'API.getBulkRequest',
-          'format': 'JSON',
-        }
-        const api = `${this.options.endpoint}?${QS.stringify(bulk)}${this.compiled}`
-
-        if (this.options.debug) {
-          /* eslint-disable-next-line no-console */
-          console.log('MatomoApi: Fetching', api)
-        }
-
-        this.fetch(api, {
-          'headers': this.options.headers,
-        })
-        .then((response) => response.json())
-        .then((data) => {
-          this.queryQueue.forEach(({callback,}, index,) => {
-            const item = data[index]
-
-            if (!item) {
-              return callback(new TypeError(`Received falsy result: ${JSON.stringify(item)} (${typeof item})`))
-            }
-
-            if (item.result === 'error') {
-              return callback(new MatomoError(item.message), null)
-            }
-
-            if (item.length === 1) {
-              return callback(null, item[0])
-            }
-
-            return callback(null, item)
-          })
-
-          this.reset()
-        })
-        .catch((error) => {
-          this.reset()
-
-          if (this.handler) {
-            return this.handler(error)
-          }
-
-          throw error
-        })
-      }, this.options.patience)
-    }
-  })
 }

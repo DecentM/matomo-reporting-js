@@ -1,7 +1,7 @@
 /* eslint-disable no-console */
 
-import MatomoApi from '.'
-import fetch from 'node-fetch'
+const MatomoApi = require('.')
+const fetch = require('node-fetch')
 
 const api = new MatomoApi({
   fetch,
