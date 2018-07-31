@@ -1,7 +1,7 @@
-import QS from 'querystring'
-import pify from 'pify'
-import {struct,} from 'superstruct'
-import util from 'util'
+const QS = require('querystring')
+const pify = require('pify')
+const {struct,} = require('superstruct')
+const util = require('util')
 
 const functionsValidator = struct({
   'fetch':   'function',
@@ -51,15 +51,11 @@ class MatomoError {
     /* eslint-disable-next-line no-console */
     return console.log(this.stack)
   }
-
-  static optionsValidator = optionsValidator
-  static functionsValidator = functionsValidator
-  static queryValidator = queryValidator
 }
 
 util.inherits(MatomoError, Error)
 
-export default class MatomoApi {
+module.exports = class MatomoApi {
   constructor (funcs, arg) {
     const {fetch, handler,} = functionsValidator(funcs)
 

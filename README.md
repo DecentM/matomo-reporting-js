@@ -22,9 +22,6 @@
 Install from NPM by running `npm i -S matomo-reporting-js`, or `yarn add matomo-reporting-js`
 Afterwards, you can pull the module in with `import MatomoApi from 'matomo-reporting-js'`
 
-Since this is a pure ES6 module, you'll need to use a transpiler (like Babel)
-to rewrite the source code to ES5 to use in a browser or an older environment.
-
 ## Options
 
 Two types of options exist:  
