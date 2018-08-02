@@ -2,9 +2,15 @@
 
 const MatomoApi = require('.')
 const fetch = require('node-fetch')
+const {Agent,} = require('https')
 
+const agent = new Agent({
+  'rejectUnauthorized': false,
+  'timeout':            10000,
+})
 const api = new MatomoApi({
   fetch,
+  agent,
 }, {
   'endpoint': 'https://demo.matomo.org/index.php',
   'idSite':   3,

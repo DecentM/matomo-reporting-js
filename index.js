@@ -5,6 +5,7 @@ const util = require('util')
 
 const functionsValidator = struct({
   'fetch':   'function',
+  'agent':   'object?',
   'handler': 'function?',
 })
 
@@ -57,7 +58,7 @@ util.inherits(MatomoError, Error)
 
 module.exports = class MatomoApi {
   constructor (funcs, arg) {
-    const {fetch, handler,} = functionsValidator(funcs)
+    const {fetch, handler, agent,} = functionsValidator(funcs)
 
     this.options = optionsValidator(arg)
     this.fetch = fetch
@@ -92,6 +93,7 @@ module.exports = class MatomoApi {
           }
 
           this.fetch(api, {
+            agent,
             'headers': this.options.headers,
           })
           .then((response) => response.json())
