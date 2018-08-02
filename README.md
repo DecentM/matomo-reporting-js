@@ -37,6 +37,11 @@ Options to pass when creating the instance with new:
     // and global.fetch in Node. Otherwise, please consult your implementation's
     // manual if any. Most browsers have window.fetch available by default.
     'fetch': global.fetch,
+    
+    // Optional, default: undefined
+    // Defines the agent to be used for the fetch call.
+    // Useful if you want to ignore SSL errors in server side applications.
+    'agent': new https.Agent(),
 
     // Optional, default: undefined
     // If you specify a handler, network and API errors will not cause the promise
