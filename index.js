@@ -120,7 +120,7 @@ module.exports = class MatomoApi {
               const item = data[index]
 
               if (!item) {
-                return callback(new TypeError(`Received falsy result: ${JSON.stringify(item)} (${typeof item})`))
+                return callback(null, {})
               }
 
               if (item.result === 'error') {
