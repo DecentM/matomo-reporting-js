@@ -19,8 +19,8 @@ const optionsValidator = struct({
   'headers':    'object?',
   'debug':      'boolean?',
   'cache':      struct.optional({
-    'maxAge':    'number',
-    'cacheSize': 'number',
+    'maxAge':  'number',
+    'maxSize': 'number',
   }),
 }, {
   'patience':   100,
