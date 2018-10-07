@@ -36,11 +36,13 @@ Options to pass when creating the instance with new:
     // If you're using isomorphic-fetch, it's window.fetch in the browser 
     // and global.fetch in Node. Otherwise, please consult your implementation's
     // manual if any. Most browsers have window.fetch available by default.
+    // type: function (must implement the fetch API)
     'fetch': global.fetch,
     
     // Optional, default: undefined
     // Defines the agent to be used for the fetch call.
     // Useful if you want to ignore SSL errors in server side applications.
+    // type: object (must implement http.Agent)
     'agent': new https.Agent(),
 
     // Optional, default: undefined
@@ -48,33 +50,54 @@ Options to pass when creating the instance with new:
     // to reject and the Error instance will be passed to the function.
     // If the handler returns anything, it will be used for the promise response.
     // Otherwise, the promise will reject for any error.
+    // type: function (receives one argument of type Error)
     'handler': (error) => sendToLoggingService(error),
   }, {
     // Mandatory
     // Set your Matomo instance's URL here
     // Depending on your server configuration, index.php may be required at the end.
+    // type: string
     'endpoint': 'https://demo.matomo.org/index.php',
     
     // Mandatory
     // Your site ID you wish to track with this instance of the client
+    // type: number
     'idSite':   3,
     
     // Optional, default: 100
     // This number (in miliseconds) dictates how much to wait for queries before
     // sending the bulk request to the API.
+    // type: number
     'patience': 100,
     
     // Optional, default: undefined
     // This string defines your authentication token if your site is not set
     // to public.
+    // type: string
     'token_auth': 'asdfghjkl1234567',
+    
+    // Optional, default: undefined
+    // This object configures caching of the fetch function you passed above.
+    // Passing the object if optional, but if passed, all properties are required.
+    // type: object (see keys below)
+    'cache': {
+      // Milliseconds until the cache expires
+      // type: number
+      'maxAge': 10000,
+
+      // How many responses should be cached - larger sizes use more memory
+      // type: number
+      'cacheSize': 100,
+    }
     
     // Optional, default: {}
     // Additional network headers to send in a key-value format
+    // type: object
     'headers': {},
     
     // Optional, default: false
     // If true, the module will log its requests to the console before sending
+    // type: boolean
     'debug': false,
   })
   ```
