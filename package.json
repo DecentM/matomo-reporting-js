@@ -27,8 +27,10 @@
     "node-fetch": "^2.2.0"
   },
   "dependencies": {
+    "p-memoize": "^2.1.0",
     "pify": "^3.0.0",
     "querystring": "^0.2.0",
+    "quick-lru": "^1.1.0",
     "superstruct": "^0.5.4"
   }
 }

@@ -2,6 +2,8 @@ const QS = require('querystring')
 const pify = require('pify')
 const {struct,} = require('superstruct')
 const util = require('util')
+const memoize = require('p-memoize')
+const LRU = require('quick-lru')
 
 const functionsValidator = struct({
   'fetch':   'function',
@@ -16,6 +18,10 @@ const optionsValidator = struct({
   'token_auth': 'string?',
   'headers':    'object?',
   'debug':      'boolean?',
+  'cache':      struct.optional({
+    'maxAge':    'number',
+    'cacheSize': 'number',
+  }),
 }, {
   'patience':   100,
   'token_auth': 'anonymous',
@@ -61,7 +67,19 @@ module.exports = class MatomoApi {
     const {fetch, handler, agent,} = functionsValidator(funcs)
 
     this.options = optionsValidator(arg)
-    this.fetch = fetch
+
+    if (typeof this.options.cache !== 'undefined') {
+      this.cache = new LRU({
+        'maxSize': this.options.cache.maxSize,
+      })
+      this.fetch = memoize(fetch, {
+        'maxAge': this.options.cache.maxAge,
+        'cache':  this.cache,
+      })
+    } else {
+      this.fetch = fetch
+    }
+
     this.handler = handler
 
     this.queryQueue = []
